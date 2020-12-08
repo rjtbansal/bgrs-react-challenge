@@ -22,3 +22,4 @@ it can still throw CORS issue once in a while. Refresh the page a few times and 
 - As I had no experience with redux, I decided to use props.
 - Would have liked to add more complex tests
 - Would have liked to enhance error handling with Snackbars 
+- Refrained from creating feature branches. Commits were made directly to Main
