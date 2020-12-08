@@ -28,15 +28,15 @@ const StarWarsCharacters = () => {
     loadCharacters();
   }, []);
 
-  return charactersFetched.length ? (
+  return  (
     <Container>
       <Typography variant="h1" body="h1" className={classes.starWarsTitle}>
         Welcome to StarWars Characters!
      </Typography>
-      <CharacterDropdown characterProps={charactersFetched} />
+      {charactersFetched.length ? <CharacterDropdown characterProps={charactersFetched} /> : <LinearProgress /> }
     </Container>
-  ) :
-    <LinearProgress />
+  ) 
+    
 }
 
 export default StarWarsCharacters;

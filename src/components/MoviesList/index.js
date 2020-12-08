@@ -1,8 +1,19 @@
 import { LinearProgress, List, ListItem, ListItemText, Paper, Typography } from "@material-ui/core";
+import { makeStyles } from '@material-ui/core/styles';
+
+const useStyles = makeStyles((theme) => ({
+  labelHeading: {
+    paddingBottom: theme.spacing(1)
+  }
+}));
 
 const MoviesList = ({ movieList, isLoading }) => {
-  return(<Paper>
-    <Typography variant="caption" body="caption">Movies</Typography>
+  
+  const classes = useStyles();
+  return (
+    <>
+    <Typography variant="h3" body="caption" className={classes.labelHeading}>Movies</Typography>
+    <Paper>
     <List>
       {
         !isLoading
@@ -14,7 +25,7 @@ const MoviesList = ({ movieList, isLoading }) => {
         <LinearProgress />
       }
     </List>
-  </Paper>);
+  </Paper></>);
 
 }
 

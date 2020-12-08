@@ -1,4 +1,4 @@
-import { FormControl, InputLabel, MenuItem, Select, Typography } from "@material-ui/core";
+import { FormControl, Grid, MenuItem, Paper, Select, Typography } from "@material-ui/core";
 import { useCallback, useEffect, useState } from "react";
 import { makeStyles } from '@material-ui/core/styles';
 import axios from "axios";
@@ -8,6 +8,22 @@ const useStyles = makeStyles((theme) => ({
   formControl: {
     margin: theme.spacing(1),
     minWidth: 120,
+  },
+  gridContainer: {
+    marginTop: theme.spacing(2)
+  },
+  characterListPaper: {
+    paddingRight: theme.spacing(2),
+    paddingLeft: theme.spacing(1),
+  },
+  labelHeading: {
+    paddingBottom: theme.spacing(1)
+  },
+  lastTitleAndYearPaper: {
+    padding: theme.spacing(1)
+  },
+  gridItem: {
+    width: theme.spacing(40)
   }
 }));
 
@@ -28,7 +44,7 @@ const CharacterDropdown = ({ characterProps }) => {
     const filmUrls = characterSelectedObj[0].films;
     const filmNames = [];
     setAreMoviesLoading(true);
-    await Promise.all(filmUrls.map(filmUrl => axios.get("https://cors-anywhere.herokuapp.com/"+filmUrl).then(response => {
+    await Promise.all(filmUrls.map(filmUrl => axios.get(filmUrl).then(response => {
       filmNames.push(response.data);
       setAreMoviesLoading(false);
     })
@@ -50,23 +66,31 @@ const CharacterDropdown = ({ characterProps }) => {
   }, [moviesByCharacter.length, getLastMovieTitleAndYear])
 
   return (
-    <>
-    <FormControl className={classes.formControl}>
-      <InputLabel id="character-label">
-        Select Character 
-      </InputLabel>
-      <Select labelId="character-label" id="character-select" value={character} onChange={handleCharacterSelection}>
-        {
-          characterProps.map(characterProp => <MenuItem value={characterProp.name.toLowerCase()} key={characterProp.name.toLowerCase()}>{ characterProp.name }</MenuItem>)
-        }
-      </Select>
-    </FormControl>
-      <MoviesList movieList={moviesByCharacter} isLoading={areMoviesLoading} />
-      <Typography component="p" variant="caption">Last Title & Year</Typography>
+    <Grid container spacing={2} direction="column" justify="center" alignItems="center" className={classes.gridContainer}>
+      <Grid item classes={{ item: classes.gridItem }}>
+        <Typography component="p" variant="h3" className={classes.labelHeading}>Character List</Typography>
+        <Paper elevation={2} className={classes.characterListPaper}>
+          <FormControl className={classes.formControl} fullWidth>
+            <Select id="character-select" value={character} onChange={handleCharacterSelection}>
+              {
+                characterProps.map(characterProp => <MenuItem value={characterProp.name.toLowerCase()} key={characterProp.name.toLowerCase()}>{ characterProp.name }</MenuItem>)
+              }
+            </Select>
+            </FormControl>
+        </Paper>
+    </Grid>
+    <Grid item classes={{ item: classes.gridItem }}>  
+        <MoviesList movieList={moviesByCharacter} isLoading={areMoviesLoading} />
+      </Grid>
+    <Grid item classes={{ item: classes.gridItem }}>
+        <Typography component="p" variant="h3" className={classes.labelHeading}>Last Title & Year</Typography>
+        <Paper elevation={2} className={classes.lastTitleAndYearPaper}>
       {
         lastMovieTitleAndYear && <Typography component="p" variant="h4">{`${lastMovieTitleAndYear.title} - ${lastMovieTitleAndYear.release_year}`}</Typography> 
-      }
-      </>
+          }
+        </Paper>
+        </Grid>
+      </Grid>
   )
 }
 
