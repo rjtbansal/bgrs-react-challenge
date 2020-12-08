@@ -24,7 +24,7 @@ const CharacterDropdown = ({ characterProps }) => {
       </InputLabel>
       <Select labelId="character-label" id="character-select" value={character} onChange={handleCharacterSelection}>
         {
-          characterProps.map(character => <MenuItem value={character.name.toLowerCase()}>{ character.name }</MenuItem>)
+          characterProps.map(characterProp => <MenuItem value={characterProp.name.toLowerCase()} key={characterProp.name.toLowerCase()}>{ characterProp.name }</MenuItem>)
         }
       </Select>
     </FormControl>
