@@ -1,5 +1,5 @@
 import { FormControl, InputLabel, MenuItem, Select, Typography } from "@material-ui/core";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { makeStyles } from '@material-ui/core/styles';
 import axios from "axios";
 import MoviesList from "../MoviesList";
@@ -21,7 +21,6 @@ const CharacterDropdown = ({ characterProps }) => {
   const handleCharacterSelection = async(event) => {
     setCharacter(event.target.value);
     setMoviesByCharacter(await loadMovieList(event.target.value));
-    getLastMovieTitleAndYear();
   }
 
   const loadMovieList = async (characterSelected) => { 
@@ -31,20 +30,24 @@ const CharacterDropdown = ({ characterProps }) => {
     setAreMoviesLoading(true);
     await Promise.all(filmUrls.map(filmUrl => axios.get("https://cors-anywhere.herokuapp.com/"+filmUrl).then(response => {
       filmNames.push(response.data);
+      setAreMoviesLoading(false);
     })
       .catch(err => console.error(err))));
-    setAreMoviesLoading(false);
     return filmNames;
   }
 
-  const getLastMovieTitleAndYear = () => {
-    if (moviesByCharacter.length !== 0) {
-      const moviesTitleAndReleaseYear = moviesByCharacter.map(movie => ({ title: movie.title, release_year: new Date(movie.release_date).getFullYear() }) );
+  const getLastMovieTitleAndYear = useCallback(() => {
+    if (moviesByCharacter.length) {
+      const moviesTitleAndReleaseYear = moviesByCharacter.map(movie => ({ title: movie.title, release_year: new Date(movie.release_date).getFullYear() }));
       moviesTitleAndReleaseYear.sort((a, b) => b.release_year - a.release_year);
       const { title, release_year } = moviesTitleAndReleaseYear[0];
       setLastMovieTitleAndYear({ title, release_year });
     }
-  }
+  }, [moviesByCharacter]);
+
+  useEffect(() => {
+    getLastMovieTitleAndYear();
+  }, [moviesByCharacter.length, getLastMovieTitleAndYear])
 
   return (
     <>
@@ -60,7 +63,9 @@ const CharacterDropdown = ({ characterProps }) => {
     </FormControl>
       <MoviesList movieList={moviesByCharacter} isLoading={areMoviesLoading} />
       <Typography component="p" variant="caption">Last Title & Year</Typography>
-      <Typography component="p" variant="h4">{lastMovieTitleAndYear ? `${lastMovieTitleAndYear.title} - ${lastMovieTitleAndYear.release_year}` : "Last Movie - Year"}</Typography> 
+      {
+        lastMovieTitleAndYear && <Typography component="p" variant="h4">{`${lastMovieTitleAndYear.title} - ${lastMovieTitleAndYear.release_year}`}</Typography> 
+      }
       </>
   )
 }
