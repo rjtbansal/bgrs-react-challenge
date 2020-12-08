@@ -1,4 +1,4 @@
-import { FormControl, InputLabel, MenuItem, Select } from "@material-ui/core";
+import { FormControl, InputLabel, MenuItem, Select, Typography } from "@material-ui/core";
 import { useState } from "react";
 import { makeStyles } from '@material-ui/core/styles';
 import axios from "axios";
@@ -16,10 +16,12 @@ const CharacterDropdown = ({ characterProps }) => {
   const [character, setCharacter] = useState('');
   const [moviesByCharacter, setMoviesByCharacter] = useState([]);
   const [areMoviesLoading, setAreMoviesLoading] = useState(false);
+  const [lastMovieTitleAndYear, setLastMovieTitleAndYear] = useState(null);
 
   const handleCharacterSelection = async(event) => {
     setCharacter(event.target.value);
     setMoviesByCharacter(await loadMovieList(event.target.value));
+    getLastMovieTitleAndYear();
   }
 
   const loadMovieList = async (characterSelected) => { 
@@ -35,7 +37,17 @@ const CharacterDropdown = ({ characterProps }) => {
     return filmNames;
   }
 
+  const getLastMovieTitleAndYear = () => {
+    if (moviesByCharacter.length !== 0) {
+      const moviesTitleAndReleaseYear = moviesByCharacter.map(movie => ({ title: movie.title, release_year: new Date(movie.release_date).getFullYear() }) );
+      moviesTitleAndReleaseYear.sort((a, b) => b.release_year - a.release_year);
+      const { title, release_year } = moviesTitleAndReleaseYear[0];
+      setLastMovieTitleAndYear({ title, release_year });
+    }
+  }
+
   return (
+    <>
     <FormControl className={classes.formControl}>
       <InputLabel id="character-label">
         Select Character 
@@ -45,8 +57,11 @@ const CharacterDropdown = ({ characterProps }) => {
           characterProps.map(characterProp => <MenuItem value={characterProp.name.toLowerCase()} key={characterProp.name.toLowerCase()}>{ characterProp.name }</MenuItem>)
         }
       </Select>
-      <MoviesList movieList={moviesByCharacter} isLoading = {areMoviesLoading} />
     </FormControl>
+      <MoviesList movieList={moviesByCharacter} isLoading={areMoviesLoading} />
+      <Typography component="p" variant="caption">Last Title & Year</Typography>
+      <Typography component="p" variant="h4">{lastMovieTitleAndYear ? `${lastMovieTitleAndYear.title} - ${lastMovieTitleAndYear.release_year}` : "Last Movie - Year"}</Typography> 
+      </>
   )
 }
 
