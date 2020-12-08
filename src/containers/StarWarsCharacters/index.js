@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 const useStyles = makeStyles((theme) => ({
   starWarsTitle: {
     textAlign: "center",
-    marginTop: "2rem"
+    marginTop: theme.spacing(2)
   }
 }));
 
